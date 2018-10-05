@@ -216,10 +216,14 @@ class Game():
 
 
 if __name__ == "__main__":
-    game = Game(size=6)
+    test_list = []
+    for _ in range(1000):
+        game = Game(size=6)
 
-    while not game.is_over():
-        color = random.randint(1, 6)
-        #  color = int(raw_input())
-        game.change(color, visual=True)
-    print(len(game.all_step), game.all_step)
+        while not game.is_over():
+            color = random.randint(1, 6)
+            #  color = int(raw_input())
+            game.change(color, visual=True)
+        test_list.append(game.step)
+    
+    print(sum(test_list) / len(test_list))

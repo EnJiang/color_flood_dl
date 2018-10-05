@@ -11,7 +11,7 @@ class ColorFlood(gym.Env):
         self.size = size
 
         self.action_space = spaces.Discrete(size)
-        self.observation_space = spaces.Box(low=1, high=6, shape=(size, size))
+        self.observation_space = spaces.Box(low=1, high=6, shape=(size, size), dtype=int)
 
         self.seed()
         self.reset()
@@ -30,7 +30,7 @@ class ColorFlood(gym.Env):
         if done:
             reward = 1
         else:
-            reward = 0
+            reward = -(1 / 33)
 
         return self.observation, reward, done, {}
 
@@ -40,7 +40,9 @@ class ColorFlood(gym.Env):
 
     @property
     def observation(self):
-        return np.copy(self.game.main_borad)
+        obs = np.copy(self.game.main_borad)
+        # obs = np.reshape(obs, obs.shape + (1, ))
+        return obs
 
 if __name__ == "__main__":
     from random import randint
