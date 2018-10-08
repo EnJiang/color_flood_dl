@@ -29,14 +29,24 @@ WINDOW_LENGTH = 4
 
 input_shape = (WINDOW_LENGTH, ) + INPUT_SHAPE
 
-model = ResNet.build(
-    INPUT_SHAPE[0],
-    INPUT_SHAPE[1],
-    WINDOW_LENGTH,
-    nb_actions,
-    stages=[3, 4, 6],
-    filters=[64, 128, 256, 512],
-    dataset="ColorFlood")
+input_shape = (WINDOW_LENGTH, ) + INPUT_SHAPE
+
+model = Sequential()
+model.add(Permute((2, 3, 1), input_shape=input_shape))
+model.add(Conv2D(filters=32, kernel_size=2, padding='same', activation='relu'))
+model.add(Conv2D(filters=64, kernel_size=2, padding='same', activation='relu'))
+model.add(Conv2D(filters=64, kernel_size=2, padding='same', activation='relu'))
+model.add(Conv2D(filters=64, kernel_size=2, padding='same', activation='relu'))
+model.add(Flatten())
+model.add(Dense(512))
+model.add(Activation('relu'))
+model.add(Dense(64))
+model.add(Activation('relu'))
+model.add(Dense(32))
+model.add(Activation('relu'))
+model.add(Dense(nb_actions, activation='linear'))
+model.summary()
+
 
 # Finally, we configure and compile our agent. You can use every built-in Keras optimizer and
 # even the metrics!
@@ -57,18 +67,18 @@ dqn = DQNAgent(
     train_interval=4,
     enable_dueling_network=True,
     delta_clip=1.)
-dqn.compile(Adam(lr=.00025), metrics=['mae'])
+dqn.compile(Adam(lr=.001), metrics=['mae'])
 
-dqn.load_weights('duel_dqn_{}_weights.h5f'.format(ENV_NAME))
+# dqn.load_weights('duel_dqn_{}_weights.h5f'.format(ENV_NAME))
 
 # Okay, now it's time to learn something! We visualize the training here for show, but this
 # slows down training quite a lot. You can always safely abort the training prematurely using
 # Ctrl + C.
 for _ in range(100):
-    dqn.fit(env, nb_steps=330000, visualize=False, verbose=1)
+    dqn.fit(env, nb_steps=50000, visualize=False, verbose=1)
 
     # After training is done, we save the final weights.
     dqn.save_weights('duel_dqn_{}_weights.h5f'.format(ENV_NAME), overwrite=True)
 
     # Finally, evaluate our algorithm for 5 episodes.
-    dqn.test(env, nb_episodes=33, visualize=False, nb_max_episode_steps=1000)
+    dqn.test(env, nb_episodes=5, visualize=False, nb_max_episode_steps=1000)
