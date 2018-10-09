@@ -130,8 +130,8 @@ def resnet(input_shape, nb_actions):
     x = Permute((2, 3, 1))(input_)
 
     # first two conv
-    x = Conv2D(filters=32, kernel_size=3, padding='same', activation='relu')(x)
     x = Conv2D(filters=64, kernel_size=3, padding='same', activation='relu')(x)
+    x = Conv2D(filters=128, kernel_size=3, padding='same', activation='relu')(x)
 
     # residual conv 1
     shortcut = x
