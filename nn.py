@@ -2,10 +2,10 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, Flatten, Conv2D, Permute
 from keras.optimizers import Adam
 
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
 __author__ = 'xuy'
- 
- 
+
+
 from keras.layers.normalization import BatchNormalization
 from keras.layers.convolutional import Conv2D, AveragePooling2D, MaxPooling2D, ZeroPadding2D
 from keras.layers.core import Activation, Flatten, Dense, Dropout
@@ -36,42 +36,42 @@ class ResNet:
         Return:
             x: Return the output of the residual module.
         """
- 
+
         # The shortcut branch of the ResNet module should be initialize as the input(identity) data.
         shortcut = x
- 
+
         # The first block of the ResNet module -- 1x1 CONVs.
         bn1   = BatchNormalization(axis=chanDim, epsilon=bnEps, momentum=bnMom)(x)
         act1  = Activation("relu")(bn1)
         # Because the biases are in the BN layers that immediately follow the convolutions, so there is no need to introduce
         #a *second* bias term since we had changed the typical CONV block order, instead of using the *pre-activation* method.
         conv1 = Conv2D(int(K * 0.25), (1, 1), use_bias=False, kernel_regularizer=l2(reg))(act1)#filter=K*0.25,kernel_size=(1,1),stride=(1,1)
- 
+
         # The second block of the ResNet module -- 3x3 CONVs.
         bn2 = BatchNormalization(axis=chanDim, epsilon=bnEps, momentum=bnMom)(conv1)
         act2 = Activation("relu")(bn2)
         conv2 = Conv2D(int(K * 0.25), (3, 3), strides=stride, padding="same", use_bias=False, kernel_regularizer=l2(reg))(act2)
- 
+
         # The third block of the ResNet module -- 1x1 CONVs.
         bn3 = BatchNormalization(axis=chanDim, epsilon=bnEps, momentum=bnMom)(conv2)
         act3 = Activation("relu")(bn3)
         conv3 = Conv2D(K, (1, 1), use_bias=False, kernel_regularizer=l2(reg))(act3)
- 
+
         # If we would like to reduce the spatial size, apply a CONV layer to the shortcut.
         if reduce:#是否降维，如果降维的话，需要将stride设置为大于1,更改shortcut值
             shortcut = Conv2D(K, (1, 1), strides=stride, use_bias=False, kernel_regularizer=l2(reg))(act1)
- 
+
         # Add together the shortcut (shortcut branch) and the final CONV (main branch).
         x = add([conv3, shortcut])#这个与googlenet的concatenate函数不同，add函数做简单加法，concatenate函数做横向拼接.该函数仅仅将shortcut部分和非shortcut部分相加在一起
- 
+
         # Return the addition as the output of the Residual module.
         return x#f(x)输出结果=conv3+shortcut
- 
+
     @staticmethod
     def build(width, height, depth, classes, stages, filters, reg=1e-4, bnEps=2e-5, bnMom=0.9, dataset="cifar"):
         inputShape = (depth, height, width)
         chanDim = 1
- 
+
         # Set the input and apply BN layer.
         input_ = Input(shape=inputShape)
 
@@ -79,46 +79,92 @@ class ResNet:
 
         # Use BN layer as the first layer, acts as an added level of normalization.在这里第一层使用BN层而不是使用conv，这样可以替代取平均值的操作
         x = BatchNormalization(axis=chanDim, epsilon=bnEps, momentum=bnMom)(x)
- 
+
         # Check if trained on the CIFAR dataset.
         if dataset == "cifar":
             # Apply the first and single CONV layer.
             x = Conv2D(filters[0], (3, 3), use_bias=False, padding="same", kernel_regularizer=l2(reg))(x)
- 
+
         # Loop over the number of stages (block names).
         for i in range(0, len(stages)):#每阶段的遍历
             # Initialize the stride, then apply a residual module used to reduce the spatial size of the input volume.
- 
+
             # If this is the first entry in the stage, we’ll set the stride to (1, 1), indicating that no downsampling
             #should be performed. However, for every subsequent stage we’ll apply a residual module with a stride of (2, 2),
             #which will allow us to decrease the volume size.
             stride = (1, 1) if i == 0 else (2, 2)
- 
+
             # Once we have stacked stages[i] residual modules on top of each other, our for loop brings us back up to here
             #where we decrease the spatial dimensions of the volume and repeat the process.
             x = ResNet.residual_module(x, filters[i + 1], stride=stride, chanDim=chanDim, reduce=True, bnEps=bnEps, bnMom=bnMom)#进行降维
- 
+
             # Loop over the number of layers in the stage.
             for j in range(0, stages[i] - 1):#每层的遍历
                 # Apply a residual module.
                 x = ResNet.residual_module(x, filters[i + 1], stride=(1, 1), chanDim=chanDim, bnEps=bnEps, bnMom=bnMom)#不进行降维
- 
+
         # After stacked all the residual modules on top of each other, we would move to the classifier stage.
         # Apply BN=>ACT=>POOL, in order to avoid using dense/FC layers we would instead apply Global Averager POOL to reduce
         #the volume size to 1x1xclasses.
         x = BatchNormalization(axis=chanDim, epsilon=bnEps, momentum=bnMom)(x)
         x = Activation("relu")(x)
         x = AveragePooling2D((2, 2))(x)
- 
+
         # Softmax classifier.
         x = Flatten()(x)
         x = Dense(classes, kernel_regularizer=l2(reg))(x)
         x = Activation("linear")(x)
- 
+
         # Construct the model.
         model = Model(input_, x, name="ResNet")
- 
+
         model.summary()#输出网络结构信息
         # plot_model(model, to_file='./output/resnet_visualization.png', show_shapes=True, show_layer_names=True)
         # Return the build network architecture.
         return model
+
+
+def resnet(input_shape, nb_actions):
+    input_ = Input(shape=input_shape)
+
+    x = Permute((2, 3, 1))(input_)
+
+    # first two conv
+    x = Conv2D(filters=32, kernel_size=3, padding='same', activation='relu')(x)
+    x = Conv2D(filters=64, kernel_size=3, padding='same', activation='relu')(x)
+
+    # residual conv 1
+    shortcut = x
+    x = Conv2D(filters=128, kernel_size=3, padding='same', activation='relu')(x)
+    x = Conv2D(filters=128, kernel_size=3, padding='same', activation='relu')(x)
+    x = add([x, shortcut])
+
+    # residual conv 2
+    shortcut = x
+    x = Conv2D(filters=128, kernel_size=3, padding='same', activation='relu')(x)
+    x = Conv2D(filters=128, kernel_size=3, padding='same', activation='relu')(x)
+    x = add([x, shortcut])
+
+    # residual conv 3
+    shortcut = x
+    x = Conv2D(filters=128, kernel_size=3, padding='same', activation='relu')(x)
+    x = Conv2D(filters=128, kernel_size=3, padding='same', activation='relu')(x)
+    x = add([x, shortcut])
+
+    # residual conv 4
+    shortcut = x
+    x = Conv2D(filters=128, kernel_size=3, padding='same', activation='relu')(x)
+    x = Conv2D(filters=128, kernel_size=3, padding='same', activation='relu')(x)
+    x = add([x, shortcut])
+
+    # last two conv
+    x = Conv2D(filters=128, kernel_size=3, padding='same', activation='relu')(x)
+    x = Conv2D(filters=128, kernel_size=3, padding='same', activation='relu')(x)
+    x = Flatten()(x)
+
+    x = Dense(1024, activation='relu')(x)
+    x = Dense(1024, activation='relu')(x)
+    x = Dense(nb_actions, activation='linear')(x)
+
+    model = Model(input_, x, name="ResNet")
+    return model

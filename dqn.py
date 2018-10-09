@@ -11,6 +11,8 @@ from rl.agents.dqn import DQNAgent
 from rl.policy import LinearAnnealedPolicy, BoltzmannQPolicy, EpsGreedyQPolicy
 from rl.memory import SequentialMemory
 
+from nn import resnet
+
 ENV_NAME = 'ColorFlood'
 
 # Get the environment and extract the number of actions.
@@ -27,20 +29,7 @@ WINDOW_LENGTH = 4
 
 input_shape = (WINDOW_LENGTH, ) + INPUT_SHAPE
 
-model = Sequential()
-model.add(Permute((2, 3, 1), input_shape=input_shape))
-model.add(Conv2D(filters=32,kernel_size=2,padding='same',activation='relu'))
-model.add(Conv2D(filters=64, kernel_size=2, padding='same', activation='relu'))
-model.add(Conv2D(filters=64, kernel_size=2, padding='same', activation='relu'))
-model.add(Conv2D(filters=64, kernel_size=2, padding='same', activation='relu'))
-model.add(Flatten())
-model.add(Dense(512))
-model.add(Activation('relu'))
-model.add(Dense(64))
-model.add(Activation('relu'))
-model.add(Dense(32))
-model.add(Activation('relu'))
-model.add(Dense(nb_actions, activation='linear'))
+model = resnet(input_shape, nb_actions)
 model.summary()
 
 # Finally, we configure and compile our agent. You can use every built-in Keras optimizer and
@@ -66,7 +55,7 @@ dqn.compile(Adam(lr=.00025), metrics=['mae'])
 # Okay, now it's time to learn something! We visualize the training here for show, but this
 # slows down training quite a lot. You can always safely abort the training prematurely using
 # Ctrl + C.
-for _ in range(100):
+for _ in range(300):
     dqn.fit(env, nb_steps=100000, visualize=False, verbose=1)
 
     # After training is done, we save the final weights.
