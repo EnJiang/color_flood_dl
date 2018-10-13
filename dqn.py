@@ -49,6 +49,8 @@ dqn = DQNAgent(
     gamma=.99,
     target_model_update=10000,
     train_interval=4,
+    enable_dueling_network=True,
+    dueling_type='avg',
     delta_clip=1.)
 dqn.compile(Adam(lr=.00025), metrics=['mae'])
 
