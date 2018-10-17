@@ -58,7 +58,7 @@ dqn.compile(Adam(lr=.00025), metrics=['mae'])
 # slows down training quite a lot. You can always safely abort the training prematurely using
 # Ctrl + C.
 for _ in range(500):
-    dqn.fit(env, nb_steps=100000, visualize=False, verbose=2)
+    dqn.fit(env, nb_steps=100000, visualize=False, verbose=1)
 
     # After training is done, we save the final weights.
     dqn.save_weights("model/resnet_ddqn_size12.h5f", overwrite=True)
