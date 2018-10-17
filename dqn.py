@@ -16,7 +16,7 @@ from nn import resnet
 ENV_NAME = 'ColorFlood'
 
 # Get the environment and extract the number of actions.
-env = ColorFlood()
+env = ColorFlood(size=12)
 np.random.seed(123)
 env.seed(123)
 nb_actions = env.action_space.n
@@ -24,8 +24,8 @@ nb_actions = env.action_space.n
 # Next, we build a very simple model regardless of the dueling architecture
 # if you enable dueling network in DQN , DQN will build a dueling network base on your model automatically
 # Also, you can build a dueling network by yourself and turn off the dueling network in DQN.
-INPUT_SHAPE = (6, 6)
-WINDOW_LENGTH = 4
+INPUT_SHAPE = (12, 12)
+WINDOW_LENGTH = 8
 
 input_shape = (WINDOW_LENGTH, ) + INPUT_SHAPE
 
@@ -57,11 +57,11 @@ dqn.compile(Adam(lr=.00025), metrics=['mae'])
 # Okay, now it's time to learn something! We visualize the training here for show, but this
 # slows down training quite a lot. You can always safely abort the training prematurely using
 # Ctrl + C.
-for _ in range(300):
-    dqn.fit(env, nb_steps=100000, visualize=False, verbose=1)
+for _ in range(500):
+    dqn.fit(env, nb_steps=100000, visualize=False, verbose=2)
 
     # After training is done, we save the final weights.
-    dqn.save_weights('duel_dqn_{}_weights.h5f'.format(ENV_NAME), overwrite=True)
+    dqn.save_weights("model/resnet_ddqn_size12.h5f", overwrite=True)
 
     # Finally, evaluate our algorithm for 5 episodes.
     dqn.test(env, nb_episodes=5, visualize=False, nb_max_episode_steps=1000)

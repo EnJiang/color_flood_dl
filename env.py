@@ -11,7 +11,7 @@ class ColorFlood(gym.Env):
         self.size = size
 
         self.action_space = spaces.Discrete(size)
-        self.observation_space = spaces.Box(low=1, high=6, shape=(size, size), dtype=int)
+        self.observation_space = spaces.Box(low=1, high=size, shape=(size, size), dtype=int)
 
         self.seed()
         self.reset()
@@ -30,7 +30,7 @@ class ColorFlood(gym.Env):
         if done:
             reward = 1
         else:
-            reward = -(1 / 33)
+            reward = -(1 / 50)
 
         return self.observation, reward, done, {}
 
