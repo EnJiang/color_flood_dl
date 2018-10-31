@@ -28,9 +28,9 @@ class ColorFlood(gym.Env):
         done = self.game.is_over()
 
         if done:
-            reward = 1
+            reward = 10
         else:
-            reward = -(1 / 50)
+            reward = -(1 / 5)
 
         return self.observation, reward, done, {}
 
