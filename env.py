@@ -10,8 +10,8 @@ class ColorFlood(gym.Env):
     def __init__(self, size=6):
         self.size = size
 
-        self.action_space = spaces.Discrete(size)
-        self.observation_space = spaces.Box(low=1, high=size, shape=(size, size), dtype=int)
+        self.action_space = spaces.Discrete(6)
+        self.observation_space = spaces.Box(low=1, high=6, shape=(size, size), dtype=int)
 
         self.seed()
         self.reset()
