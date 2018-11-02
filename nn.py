@@ -22,7 +22,7 @@ def resnet(input_shape, nb_actions):
     x = Conv2D(
         filters=128, kernel_size=3, padding='same', activation='relu')(x)
     x = Conv2D(
-        filters=128, kernel_size=3, padding='same', activation='relu')(x)
+        filters=512, kernel_size=3, padding='same', activation='relu')(x)
 
     # residual conv
     residual_module_n = 30
