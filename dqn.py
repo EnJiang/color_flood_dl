@@ -46,7 +46,7 @@ dqn = DQNAgent(
     policy=policy,
     memory=memory,
     nb_steps_warmup=50000,
-    gamma=.99,
+    gamma=.9999,
     target_model_update=10000,
     train_interval=4,
     enable_dueling_network=True,
@@ -61,7 +61,7 @@ for _ in range(500):
     dqn.fit(env, nb_steps=100000, visualize=False, verbose=1)
 
     # After training is done, we save the final weights.
-    dqn.save_weights("model/resnet_ddqn_size12.h5f", overwrite=True)
+    dqn.save_weights("model/resnet_ddqn_large_size12.h5f", overwrite=True)
 
-    # Finally, evaluate our algorithm for 5 episodes.
-    dqn.test(env, nb_episodes=5, visualize=False, nb_max_episode_steps=1000)
+    # Finally, evaluate our algorithm for 10 episodes.
+    dqn.test(env, nb_episodes=10, visualize=False, nb_max_episode_steps=200)
