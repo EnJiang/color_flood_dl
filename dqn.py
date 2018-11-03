@@ -25,7 +25,7 @@ nb_actions = env.action_space.n
 # if you enable dueling network in DQN , DQN will build a dueling network base on your model automatically
 # Also, you can build a dueling network by yourself and turn off the dueling network in DQN.
 INPUT_SHAPE = (12, 12)
-WINDOW_LENGTH = 8
+WINDOW_LENGTH = 4
 
 input_shape = (WINDOW_LENGTH, ) + INPUT_SHAPE
 
@@ -46,7 +46,7 @@ dqn = DQNAgent(
     policy=policy,
     memory=memory,
     nb_steps_warmup=50000,
-    gamma=.9999,
+    gamma=.99,
     target_model_update=10000,
     train_interval=4,
     enable_dueling_network=True,
