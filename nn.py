@@ -22,70 +22,70 @@ def resnet(input_shape, nb_actions):
     x = Conv2D(
         filters=128, kernel_size=3, padding='same', activation='relu')(x)
     x = Conv2D(
-        filters=128, kernel_size=3, padding='same', activation='relu')(x)
+        filters=512, kernel_size=3, padding='same', activation='relu')(x)
 
     # residual conv 1
     shortcut = x
     x = Conv2D(
-        filters=128, kernel_size=3, padding='same', activation='relu')(x)
+        filters=512, kernel_size=3, padding='same', activation='relu')(x)
     x = Conv2D(
-        filters=128, kernel_size=3, padding='same', activation='relu')(x)
+        filters=512, kernel_size=3, padding='same', activation='relu')(x)
     x = add([x, shortcut])
 
     # residual conv 2
     shortcut = x
     x = Conv2D(
-        filters=128, kernel_size=3, padding='same', activation='relu')(x)
+        filters=512, kernel_size=3, padding='same', activation='relu')(x)
     x = Conv2D(
-        filters=128, kernel_size=3, padding='same', activation='relu')(x)
+        filters=512, kernel_size=3, padding='same', activation='relu')(x)
     x = add([x, shortcut])
 
     # residual conv 3
     shortcut = x
     x = Conv2D(
-        filters=128, kernel_size=3, padding='same', activation='relu')(x)
+        filters=512, kernel_size=3, padding='same', activation='relu')(x)
     x = Conv2D(
-        filters=128, kernel_size=3, padding='same', activation='relu')(x)
+        filters=512, kernel_size=3, padding='same', activation='relu')(x)
     x = add([x, shortcut])
 
     # residual conv 4
     shortcut = x
     x = Conv2D(
-        filters=128, kernel_size=3, padding='same', activation='relu')(x)
+        filters=512, kernel_size=3, padding='same', activation='relu')(x)
     x = Conv2D(
-        filters=128, kernel_size=3, padding='same', activation='relu')(x)
+        filters=512, kernel_size=3, padding='same', activation='relu')(x)
     x = add([x, shortcut])
 
     # residual conv 5
     shortcut = x
     x = Conv2D(
-        filters=128, kernel_size=3, padding='same', activation='relu')(x)
+        filters=512, kernel_size=3, padding='same', activation='relu')(x)
     x = Conv2D(
-        filters=128, kernel_size=3, padding='same', activation='relu')(x)
+        filters=512, kernel_size=3, padding='same', activation='relu')(x)
     x = add([x, shortcut])
 
     # residual conv 6
     shortcut = x
     x = Conv2D(
-        filters=128, kernel_size=3, padding='same', activation='relu')(x)
+        filters=512, kernel_size=3, padding='same', activation='relu')(x)
     x = Conv2D(
-        filters=128, kernel_size=3, padding='same', activation='relu')(x)
+        filters=512, kernel_size=3, padding='same', activation='relu')(x)
     x = add([x, shortcut])
 
     # residual conv 7
     shortcut = x
     x = Conv2D(
-        filters=128, kernel_size=3, padding='same', activation='relu')(x)
+        filters=512, kernel_size=3, padding='same', activation='relu')(x)
     x = Conv2D(
-        filters=128, kernel_size=3, padding='same', activation='relu')(x)
+        filters=512, kernel_size=3, padding='same', activation='relu')(x)
     x = add([x, shortcut])
 
     # residual conv 8
     shortcut = x
     x = Conv2D(
-        filters=128, kernel_size=3, padding='same', activation='relu')(x)
+        filters=512, kernel_size=3, padding='same', activation='relu')(x)
     x = Conv2D(
-        filters=128, kernel_size=3, padding='same', activation='relu')(x)
+        filters=512, kernel_size=3, padding='same', activation='relu')(x)
     x = add([x, shortcut])
 
     x = GlobalMaxPooling2D()(x)
