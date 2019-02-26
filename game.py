@@ -211,12 +211,12 @@ class Game():
         return output
 
 
-if __name__ == "__main__":
+def rand():
     import time
 
     test_list = []
     start = time.time()
-    for _ in range(5000):
+    for _ in range(100):
         if _ % 1000 == 0:
             print(_)
         game = Game(size=6)
@@ -227,7 +227,72 @@ if __name__ == "__main__":
             game.change(color, visual=False)
         test_list.append(game.step)
 
-    print(sum(test_list) / len(test_list))
+    print(sum(test_list) / len(test_list), len(test_list))
     end = time.time()
 
     print((end - start) / 1000)
+
+def greedy(n):
+    from itertools import product
+    from copy import deepcopy
+
+    action_seq_list = product((0, 1, 2, 3, 4, 5), repeat=n)
+    def f_rand_14738465(seq):
+        iter1 = iter(seq)
+        iter2 = iter(seq)
+        next(iter2)
+        for a, b in zip(iter1, iter2):
+            if a == b:
+                return False
+        return True
+    action_seq_list = filter(f_rand_14738465, action_seq_list)
+    action_seq_list = list(action_seq_list)
+
+    def run(game, seq):
+        tmp_game = deepcopy(game)
+        for i, a in enumerate(seq):
+            tmp_game.change(a, start=0)
+            if tmp_game.is_over():
+                return i, tmp_game.target_area
+        return i, tmp_game.target_area
+
+    a_list = []
+    while True:
+        done = False
+        game = Game(size=12)
+        while True:
+            best_area = -9999
+            best_seq = None
+            best_middle_cut = np.inf
+            for seq in action_seq_list:
+                middle_cut, area = run(game, seq)
+                if area < game.size ** 2: # not done:
+                    if area > best_area:
+                        best_area = area
+                        best_seq = seq
+                else: # done
+                    if best_area == game.size ** 2: # last is also done
+                        if middle_cut < best_middle_cut: # compare middle cut
+                            best_middle_cut = middle_cut
+                            best_seq = seq
+                    else: # last is not done
+                        best_area = area
+                        best_seq = seq
+            # got best seq, run till done
+            while not done:
+                for a in best_seq:
+                    game.change(a, start=0)
+                    done = game.is_over()
+                    if done:
+                        break
+                break
+
+            # outer loop, if done, record
+            if done:
+                a_list.append(game.step)
+                print(sum(a_list) / len(a_list), len(a_list))
+                break
+
+
+if __name__ == "__main__":
+    greedy(4)

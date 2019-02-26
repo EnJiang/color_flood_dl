@@ -57,11 +57,14 @@ dqn.compile(Adam(lr=.00025), metrics=['mae'])
 # Okay, now it's time to learn something! We visualize the training here for show, but this
 # slows down training quite a lot. You can always safely abort the training prematurely using
 # Ctrl + C.
-for _ in range(500):
-    dqn.fit(env, nb_steps=100000, visualize=False, verbose=1)
+# for _ in range(500):
+#     dqn.fit(env, nb_steps=100000, visualize=False, verbose=1)
 
-    # After training is done, we save the final weights.
-    dqn.save_weights("model/resnet_ddqn_size12.h5f", overwrite=True)
+#     # After training is done, we save the final weights.
+#     dqn.save_weights("model/resnet_ddqn_size12.h5f", overwrite=True)
 
-    # Finally, evaluate our algorithm for 5 episodes.
-    dqn.test(env, nb_episodes=5, visualize=False, nb_max_episode_steps=1000)
+#     # Finally, evaluate our algorithm for 5 episodes.
+#     dqn.test(env, nb_episodes=5, visualize=False, nb_max_episode_steps=1000)
+
+dqn.load_weights("model/resnet_ddqn_size12.h5f")
+dqn.test(env, nb_episodes=1000, visualize=False, nb_max_start_steps=0, nb_max_episode_steps=1000)
